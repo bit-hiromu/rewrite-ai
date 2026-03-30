@@ -1,0 +1,7 @@
+/* Tailwind CSSの3つのレイヤーをインポート */
+/* base: ブラウザのデフォルトスタイルをリセット */
+/* components: 再利用可能なコンポーネントスタイル */
+/* utilities: ユーティリティクラス（text-xl, mt-4 など） */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "RewriteAI",
+    "slug": "rewrite-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "rewrite-ai",
+    "platforms": ["ios", "android"],
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# 依存関係
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Expo
+.expo/
+dist/
+
+# Turbo
+.turbo/
+
+# 環境変数（絶対にコミットしない）
+.env
+.env.local
+.env.*.local
+apps/web/.env.local
+apps/mobile/.env
+
+# ビルド成果物
+packages/shared/dist/
+
+# OS
+.DS_Store
+Thumbs.db

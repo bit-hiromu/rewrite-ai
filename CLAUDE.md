@@ -5,50 +5,75 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev    # Start development server (Vite)
-npm run build  # Build for production (outputs to dist/)
-```
+# 開発サーバー起動
+pnpm dev:web      # Next.js Web → localhost:3000
+pnpm dev:mobile   # Expo モバイル開発サーバー
+pnpm dev          # Web + Mobile 同時起動
 
-No test or lint scripts are configured.
+# ビルド・Lint
+pnpm build        # 全パッケージをビルド
+pnpm lint         # 全パッケージをLint
+
+# 依存関係インストール
+pnpm install      # ルートで実行（全ワークスペース対象）
+```
 
 ## Architecture
 
-This is a **React + Vite** single-page application — a group homepage with a marine/ocean theme, originally generated from a Figma design.
+これは **RewriteAI** — AIを活用した文章リライト・トーン変換・翻訳ツール。
+**Turborepo + pnpm** を使ったmonorepo構成。
 
-### Page Structure
+### プロジェクト構成
 
-`src/main.tsx` → `src/app/App.tsx` renders these sections top-to-bottom:
+```
+rewrite-ai/
+├── apps/
+│   ├── web/          # Next.js 14 (App Router, TypeScript, Tailwind CSS)
+│   └── mobile/       # Expo (React Native, TypeScript, Expo Router)
+├── packages/
+│   └── shared/       # 共通型定義・AI Router・プロンプトテンプレート
+├── turbo.json        # Turboパイプライン定義
+├── pnpm-workspace.yaml
+└── package.json      # ルートスクリプト
+```
 
-- `Header` — navigation
-- `HeroSection` — top banner
-- `AboutSection` — about content
-- `MembersSection` — team members (Subara, ViVi)
-- `VideoSection` — embedded videos
-- `FanArtSection` — fan art gallery
-- `QuestionBoxSection` — Q&A
-- `Footer`
+### packages/shared の構成
 
-Background animations (`SeaCreatures`, `Bubbles`, `WaterSurface`) are layered via absolute/relative positioning.
+```
+packages/shared/src/
+├── types/     # 共通型定義（RewriteRequest, User, AIConfig など）
+├── ai-router/ # AI Router（Groq/Claude プロバイダ切替）
+├── prompts/   # プロンプトテンプレート（リライト・トーン・翻訳）
+└── utils/     # 共通ユーティリティ
+```
+
+### AI戦略（二段階構成）
+
+- **Phase A（初期）**: Groq API 無料枠（Llama 3.3 70B / Llama 4 Scout）→ コスト¥0
+- **Phase B（スケール時）**: Claude API（claude-sonnet-4-6）→ 高品質・有料
+- 切替は環境変数 `AI_PROVIDER=groq|claude` で即座に対応
 
 ### Key Conventions
 
-- Path alias `@` maps to `src/` (configured in `vite.config.ts`)
-- Styling: Tailwind CSS v4 (via `@tailwindcss/vite` plugin) + Emotion for styled components
-- UI primitives: Radix UI and MUI components live in `src/app/components/ui/`
-- Assets (images) imported directly in TSX files; types declared in `images.d.ts`
-- **Do not remove** the `react()` or `tailwindcss()` plugins from `vite.config.ts` — both are required
-- **Do not add** `.css`, `.tsx`, or `.ts` to `assetsInclude` in `vite.config.ts`
+- `packages/shared` の型を Web・Mobile 両方からインポートして使う
+- `@rewrite-ai/shared` パッケージ名でワークスペース参照
+- Web の API Route (`apps/web/app/api/`) がバックエンドを担う
+- AI Router レイヤーを挟むことで、フロント変更なしにAIプロバイダを切替可能
 
 ### Tech Stack
 
-| Layer | Library |
+| レイヤー | 技術 |
 |---|---|
-| Build | Vite 6, TypeScript |
-| UI | React 18, Radix UI, MUI, Lucide icons |
-| Styling | Tailwind CSS v4, Emotion |
-| Animation | Motion (Framer Motion successor) |
-| Routing | React Router 7 |
-| Forms | React Hook Form |
+| モノレポ | Turborepo + pnpm workspaces |
+| Web | Next.js 14 (App Router), TypeScript strict |
+| モバイル | Expo (React Native), Expo Router |
+| 共通 | TypeScript strict, packages/shared |
+| スタイリング | Tailwind CSS v3 (Web) |
+| AI (Phase A) | Groq API（Llama 3.3 70B / Llama 4 Scout）|
+| AI (Phase B) | Claude API（claude-sonnet-4-6）|
+| DB・認証 | Supabase (PostgreSQL + Auth) |
+| デプロイ (Web) | Vercel |
+| デプロイ (Mobile) | EAS Build (Expo) |
 
 ## Mandatory Rules for Claude Code
 
